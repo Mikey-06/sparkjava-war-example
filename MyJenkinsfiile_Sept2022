@@ -1,7 +1,7 @@
 node{
   def mavenHome = tool name: 'maven3.8.6'
 	stage('1CloneCode'){
-	git "https://github.com/Mikey-06/maven-web-application.git"
+	git "https://github.com/Mikey-06/sparkjava-war-example.git"
 	}
 	stage('2Test&Build'){
 	sh "${mavenHome}/bin/mvn clean package"
