@@ -1,0 +1,41 @@
+node{
+  def mavenHome = tool name: 'maven3.8.6'
+	stage('1CloneCode'){
+	git "https://github.com/Mikey-06/maven-web-application.git"
+	}
+	stage('2Test&Build'){
+	sh "${mavenHome}/bin/mvn clean package"
+	}
+	stage('3CodeQuuality'){
+	sh "${mavenHome}/bin/mvn sonar:sonar"
+	}
+	stage('4UploadArtifact'){
+	sh "${mavenHome}/bin/mvn deploy"
+	}
+
+	stage('5DeploytoUAT'){
+	sh 'echo deploy to UAT' 
+		deploy adapters: [tomcat8(credentialsId: 'tomcat-credentials', path: '', url: 'http://3.12.103.55:8080')], contextPath: null, onFailure: false, war: 'target/*war'
+	}
+
+	
+
+	stage('6ApprovalGate'){
+	sh "echo 'ready for review' "
+	timeout(time:5, unit: 'DAYS') {
+	input message: 'Application ready for deployment, Please review and approve'
+	}
+	}
+
+	stage('7Deploy2Production'){
+	deploy adapters: [tomcat8(credentialsId: 'tomcat-credentials', path: '', url: 'http://3.12.103.55:8080')], contextPath: null, onFailure: false, war: 'target/*war'
+	}
+
+	stage('8EmailNotification'){
+	emailext body: '''HI all,
+
+Please review
+
+Building Kingdoms Tech''', recipientProviders: [buildUser(), developers(), upstreamDevelopers(), contributor()], subject: 'Build Status', to: 'manyanwu06@gmail.com'
+	}
+}
