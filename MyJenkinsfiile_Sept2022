@@ -6,9 +6,9 @@ node{
 	stage('2Test&Build'){
 	sh "${mavenHome}/bin/mvn clean package"
 	}
-	//stage('3CodeQuuality'){
+	/*stage('3CodeQuuality'){
 	sh "${mavenHome}/bin/mvn sonar:sonar"
-	}
+	} */
 	stage('4UploadArtifact'){
 	sh "${mavenHome}/bin/mvn deploy"
 	}
